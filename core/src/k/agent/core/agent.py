@@ -249,8 +249,10 @@ def finish_action(
 ) -> MemoryRecord:
     """Finalize the run with a structured summary.
 
-    Call this as the final step after all required channel responses are sent.
-    The payload should summarize what the user asked and how you reacted.
+    Call this as the final step after completing the delivery step required by
+    the channel skill. For adapter-delivered channels, `raw_output` is the
+    prepared reply that the adapter sends after this run returns. The payload
+    should summarize what the user asked and how you reacted.
     Detailed field contracts are defined in `<CompactedRules>`.
 
     Args:

@@ -10,6 +10,8 @@ google_api_key = ""
 # Uncomment these if you use a different provider.
 # openai_api_key = ""
 # openai_base_url = ""
+# For DeepSeek, disable thinking mode when using Kapybara's structured tool calls.
+# openai_extra_body = { thinking = { type = "disabled" } }
 # anthropic_api_key = ""
 # anthropic_base_url = ""
 

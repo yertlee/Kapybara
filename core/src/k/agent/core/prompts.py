@@ -22,7 +22,8 @@ Each fact should have one owner field:
 - `raw_input`: what was received.
 - `input_intents`: what the sender wanted.
 - `compacted_actions`: what the agent did and observed while executing.
-- `raw_output`: what was externally delivered (or why nothing was sent).
+- `raw_output`: what was externally delivered or, when the channel skill assigns
+  delivery to an adapter, the exact user-facing reply ready for that adapter.
 
 Do not duplicate the same fact across fields unless a short pointer is required
 for clarity (for example, "see raw_output").
@@ -46,11 +47,15 @@ for clarity (for example, "see raw_output").
 - Omit noisy metadata that does not affect task understanding or execution.
 
 2) `raw_output`
-- Human-readable summary of what was delivered externally.
+- Human-readable record of what was delivered externally, or the exact reply
+  ready for an adapter when the channel skill assigns delivery to it.
 - Same standard as `raw_input`: preserve user-facing body text verbatim (no
   translation or semantic rewrite).
 - For upload-mode long text or files, output links instead of inlining payloads.
-- If no external response was sent, state that explicitly and include the reason.
+- If the channel skill assigns delivery to an adapter, put the complete
+  user-facing reply here so the adapter can send it after the run.
+- If no external response was sent or prepared, state that explicitly and
+  include the reason.
 
 3) `input_intents`
 - Interpreted intent summary: who the sender is and what they want.
@@ -192,12 +197,19 @@ The structured `Event.content` may include IDs or other routing hints.
 
 **IMPORTANT:** Your plain/direct reply in this chat will be ignored (it becomes internal memory only) unless the event explicitly supports direct replies.
 **Therefore, when interpreting the user's intent(s), you MUST also figure out how to send the reply via the same channel the event came from.**
-Use `messager/{root(Event.out_channel or Event.in_channel)}` to send any required reply via the correct channel (do not rely on a plain/direct reply here).
+Use `messager/{root(Event.out_channel or Event.in_channel)}` to follow the
+channel's delivery contract. If that skill says an adapter sends the reply
+after `agent_run` returns, put the complete reply in `finish_action.raw_output`
+and do not send it directly. Otherwise, use the channel skill to send any
+required reply before calling `finish_action` (do not rely on a plain/direct
+reply here).
 
 Response policy:
 - Not every event requires a response; it is OK to finish without replying.
 - If needed, you may respond more than once because the input may contain multiple intents.
-- **If a response is needed, send it via the channel-specific skill(s) before calling `finish_action`.**
+- **If the channel skill assigns delivery to the adapter, prepare the reply in
+  `finish_action.raw_output`; otherwise send it via the channel skill before
+  calling `finish_action`.**
 </ResponseInstruct>
 """
 

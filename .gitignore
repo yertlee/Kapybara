@@ -10,6 +10,7 @@ data/*
 data/fs/*
 !data/fs/.env.example
 !data/fs/start.example.sh
+!data/fs/start.feishu.example.sh
 
 
 !data/fs/.kapybara/
@@ -25,4 +26,6 @@ data/fs/.kapybara/skills/*
 !data/fs/.kapybara/skills/meta/
 !data/fs/.kapybara/skills/context/
 !data/fs/.kapybara/skills/messager/
+!data/fs/.kapybara/skills/messager/feishu/
+!data/fs/.kapybara/skills/messager/feishu/SKILLS.md
 !data/fs/.kapybara/skills/maintain/

@@ -1,0 +1,10 @@
+/docker/basic-os/docker-entrypoint.sh text eol=lf
+/docker/basic-os/crontabs/root text eol=lf
+/data/fs/start.feishu.example.sh text eol=lf
+/data/fs/.kapybara/.bashrc text eol=lf
+/data/fs/.kapybara/skills/core/read-video/read text eol=lf
+/data/fs/.kapybara/skills/core/web-fetch/fetch text eol=lf
+/data/fs/.kapybara/skills/core/web-search/search text eol=lf
+/data/fs/.kapybara/skills/messager/telegram/send_document text eol=lf
+/data/fs/.kapybara/skills/meta/edit-file/edit text eol=lf
+/data/fs/.kapybara/skills/meta/retrieve-memory/stage_a text eol=lf

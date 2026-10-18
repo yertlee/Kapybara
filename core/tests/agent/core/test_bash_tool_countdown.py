@@ -71,6 +71,7 @@ class _FakeDeps:
     stuck_warning: int = 0
     stuck_warning_limit: int = 3
     count_down: int = 20
+    start_event: object | None = None
 
 
 def _ctx(
@@ -140,6 +141,45 @@ async def test_bash_wait_skips_request_limit_warning_before_threshold() -> None:
     )
     assert isinstance(res, BashEvent)
     assert res.system_msg is None
+
+
+@pytest.mark.anyio
+async def test_feishu_near_limit_warning_reserves_reply_completion_budget() -> None:
+    deps = _FakeDeps(
+        count_down=20,
+        start_event=SimpleNamespace(effective_out_channel="feishu/chat/oc_chat"),
+    )
+    deps.shell_manager.next_results.append((b"partial source result\n", b"", 0))
+
+    result = await bash_wait(
+        _ctx(deps, run_step=35, metadata={"request_limit": 50}),
+        "whatever",
+    )
+
+    assert isinstance(result, BashEvent)
+    assert result.system_msg is not None
+    assert "run step 35/50" in result.system_msg
+    assert "concise, non-empty, user-facing partial answer" in result.system_msg
+    assert "finish_action` now" in result.system_msg
+    assert "Do not claim that no reply was sent" in result.system_msg
+    assert "do not use a messaging tool" in result.system_msg
+
+
+@pytest.mark.anyio
+async def test_feishu_warning_starts_before_generic_warning_threshold() -> None:
+    deps = _FakeDeps(
+        count_down=20,
+        start_event=SimpleNamespace(effective_out_channel="feishu/chat/oc_chat"),
+    )
+    deps.shell_manager.next_results.append((b"ok\n", b"", 0))
+
+    result = await bash_wait(
+        _ctx(deps, run_step=34, metadata={"request_limit": 50}),
+        "whatever",
+    )
+
+    assert isinstance(result, BashEvent)
+    assert result.system_msg is None
 
 
 @pytest.mark.anyio

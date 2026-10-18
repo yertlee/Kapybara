@@ -31,6 +31,7 @@ _BASH_STDIO_TOKEN_LIMIT = 16000
 _CL100K_BASE_ENCODING: Any | None = None
 _BASH_COUNTDOWN_SYSTEM_MSG = "You've been working for a while. Pause to send a brief progress update to the originating event channel, then continue working."
 _REQUEST_LIMIT_WARNING_BUFFER = 5
+_FEISHU_REQUEST_LIMIT_WARNING_BUFFER = 15
 
 
 def _near_request_limit_step(
@@ -56,18 +57,41 @@ def _request_limit_from_runtime_metadata(metadata: dict[str, Any] | None) -> int
     return value if isinstance(value, int) else None
 
 
-def _near_request_limit_system_msg(*, run_step: int, request_limit: int) -> str:
+def _near_request_limit_system_msg(
+    *, run_step: int, request_limit: int, response_channel: str | None = None
+) -> str:
     """Return a near-limit warning message for `BashEvent.system_msg`."""
 
     remaining = max(request_limit - run_step, 0)
+    if response_channel and response_channel.split("/", 1)[0] == "feishu":
+        return (
+            f"You are at run step {run_step}/{request_limit}. "
+            f"Remaining model requests before limit: {remaining}. "
+            "IMMEDIATELY STOP ALL TOOL AND COMMAND WORK. The Feishu adapter "
+            "sends the reply after this run, so do not use a messaging tool or "
+            "describe delivery mechanics. Call `finish_action` now and put a "
+            "concise, non-empty, user-facing partial answer in `raw_output`, "
+            "using only facts already verified. If the task is incomplete, say "
+            "briefly what you verified and what remains. Do not claim that no "
+            "reply was sent or that the request limit has already been reached."
+        )
     return (
         f"You are at run step {run_step}/{request_limit}. "
         f"Remaining model requests before limit: {remaining}. "
         "IMMEDIATELY STOP ALL CURRENT WORK RIGHT NOW. Do not run any additional "
-        "commands or continue ongoing tasks. If a response is required, send it "
-        "now via the channel skill(s), then call `finish_action` immediately."
-        "Be honest about the situation in your response and admit that the request limit has been reached."
+        "commands or continue ongoing tasks. If a response is required, use "
+        "the channel skill's delivery contract and call `finish_action` "
+        "immediately. Be factual about what is complete and do not claim the "
+        "request limit has been reached unless it actually has."
     )
+
+
+def _response_channel_from_deps(deps: Any) -> str | None:
+    """Read the active output channel from agent deps when available."""
+
+    event = getattr(deps, "start_event", None)
+    channel = getattr(event, "effective_out_channel", None)
+    return channel if isinstance(channel, str) else None
 
 
 def _cl100k_base_token_len(text: str) -> int:
@@ -146,9 +170,18 @@ def bash_countdown_tool[**P, R](
                     result.system_msg, _BASH_COUNTDOWN_SYSTEM_MSG
                 )
             request_limit = _request_limit_from_runtime_metadata(ctx.metadata)
+            response_channel = _response_channel_from_deps(deps)
+            is_feishu = bool(
+                response_channel
+                and response_channel.split("/", 1)[0] == "feishu"
+            )
             warning_step = _near_request_limit_step(
                 request_limit=request_limit,
-                warning_buffer=_REQUEST_LIMIT_WARNING_BUFFER,
+                warning_buffer=(
+                    _FEISHU_REQUEST_LIMIT_WARNING_BUFFER
+                    if is_feishu
+                    else _REQUEST_LIMIT_WARNING_BUFFER
+                ),
             )
             if warning_step is not None and ctx.run_step >= warning_step:
                 assert request_limit is not None
@@ -157,6 +190,7 @@ def bash_countdown_tool[**P, R](
                     _near_request_limit_system_msg(
                         run_step=ctx.run_step,
                         request_limit=request_limit,
+                        response_channel=response_channel,
                     ),
                 )
 

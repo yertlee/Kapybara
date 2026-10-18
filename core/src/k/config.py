@@ -54,6 +54,7 @@ class AgentRunCliConfig(BaseModel):
     model_name: str
     openai_api_key: str | None = None
     openai_base_url: str | None = None
+    openai_extra_body: dict[str, object] | None = None
     google_api_key: str | None = None
     google_base_url: str | None = None
     anthropic_api_key: str | None = None

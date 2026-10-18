@@ -105,6 +105,11 @@ def agent_run_model_from_config(
                 api_key=agent_run_config.openai_api_key,
                 base_url=agent_run_config.openai_base_url,
             ),
+            settings=(
+                {"extra_body": agent_run_config.openai_extra_body}
+                if agent_run_config.openai_extra_body is not None
+                else None
+            ),
         )
     if agent_run_config.provider == "google":
         from pydantic_ai.models.google import GoogleModel

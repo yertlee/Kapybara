@@ -12,7 +12,7 @@ export LC_ALL=C.UTF-8        # or C, depending on your needs
 export LANG=C.UTF-8
 export TZ=UTC 
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
-stty -echo; 
+if [ -t 0 ]; then stty -echo; fi
 set -a; 
 [ -f ~/.env ] && . ~/.env
 set +a; 
