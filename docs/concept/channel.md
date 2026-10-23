@@ -23,9 +23,10 @@ A channel is a URL-path-like hierarchy:
 - No empty segments
 - No leading or trailing slash
 
-Example (Telegram thread input):
+Example of a hierarchical channel (the current Feishu starter emits
+`feishu/chat/<chat_id>` for direct messages):
 
-`telegram/chat/<chat_id>/thread/<message_thread_id>`
+`feishu/chat/<chat_id>/thread/<message_thread_id>`
 
 ## Skill injection
 
@@ -43,11 +44,11 @@ using prefix matching.
 
 Example:
 
-- Query prefix: `telegram/chat/<chat_id>`
+- Query prefix: `feishu/chat/<chat_id>`
 - Matches:
-  - `telegram/chat/<chat_id>`
-  - `telegram/chat/<chat_id>/thread/1`
-  - `telegram/chat/<chat_id>/thread/2`
+  - `feishu/chat/<chat_id>`
+  - `feishu/chat/<chat_id>/thread/1`
+  - `feishu/chat/<chat_id>/thread/2`
 
 ## Preference injection
 
@@ -62,15 +63,15 @@ Preference files are resolved from `~/.kapybara/preferences`.
    - `<prefix>.md`
    - `<prefix>/PREFERENCES.md`
 
-Example for `telegram/chat/<chat_id>`:
+Example for `feishu/chat/<chat_id>`:
 
 1. `PREFERENCES.md`
-2. `telegram.md`
-3. `telegram/PREFERENCES.md`
-4. `telegram/chat.md`
-5. `telegram/chat/PREFERENCES.md`
-6. `telegram/chat/<chat_id>.md`
-7. `telegram/chat/<chat_id>/PREFERENCES.md`
+2. `feishu.md`
+3. `feishu/PREFERENCES.md`
+4. `feishu/chat.md`
+5. `feishu/chat/PREFERENCES.md`
+6. `feishu/chat/<chat_id>.md`
+7. `feishu/chat/<chat_id>/PREFERENCES.md`
 
 ## Required Fields
 

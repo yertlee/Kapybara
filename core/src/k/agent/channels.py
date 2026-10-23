@@ -2,7 +2,7 @@
 
 Channels are URL-path-like strings (slash-separated, no empty segments) used by
 events and memory records to represent routing scopes such as:
-`telegram/chat/<chat_id>/thread/<thread_id>`.
+`feishu/chat/<chat_id>`.
 """
 
 from __future__ import annotations

@@ -4,7 +4,7 @@
 `dict[unique_contact_id, list[platform_contact_id]]`.
 
 Example:
-`{"c1": ["telegram/42"], "c2": ["discord/alice"]}`
+`{"c1": ["feishu/ou_example"], "c2": ["discord/alice"]}`
 
 Runtime contract:
 - Input events carry `contacts` as platform contact ids (`<platform>/<id>`).

@@ -1,7 +1,7 @@
 """Core agent implementation.
 
 Public entrypoints:
-- `Event`: structured input wrapper used by starters (e.g. Telegram polling).
+- `Event`: structured input wrapper used by starters (e.g. Feishu messages).
 - `MyDeps`: deps container used by tools/runtime.
 - `agent_run`: run the agent and return a `MemoryRecord`.
 """

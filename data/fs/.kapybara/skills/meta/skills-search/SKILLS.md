@@ -25,7 +25,7 @@ find ~/.kapybara/skills/ -type f -name 'SKILLS.md' | grep "skill-name"
 Use `ripgrep` (`rg`) to search for keywords across all `SKILLS.md` files. This is the most effective way to find a skill for a specific task.
 ```bash
 rg -i "ffmpeg" ~/.kapybara/skills/
-rg -i "telegram" ~/.kapybara/skills/
+rg -i "feishu" ~/.kapybara/skills/
 ```
 
 ## 4. Read skill documentation

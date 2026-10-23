@@ -510,7 +510,7 @@ class FolderMemoryStore(MemoryStore):
       `num` cap.
     - `filter_by_in_channel()` remains stage_a-like (`rg` + core validation)
       to keep retrieval tolerant for partially populated core files.
-    - `search_by_keywords()` mirrors Telegram stage_a and shells out to `rg`.
+    - `search_by_keywords()` mirrors the stage_a retrieval script and shells out to `rg`.
 
     Load behavior is self-healing for missing records:
     - Parent/child ids pointing to missing records are dropped from the visible

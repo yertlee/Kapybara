@@ -40,7 +40,7 @@ sed -n '3,8p' ~/.kapybara/memories/records/YYYY/MM/DD/HH/<id>.detailed.jsonl
 
 ### Search compacted steps in core files
 ```bash
-rg -n --sort path -g "*.core.json" 'ffmpeg|telegram|fish' ~/.kapybara/memories/records | head -n 10
+rg -n --sort path -g "*.core.json" 'ffmpeg|feishu|fish' ~/.kapybara/memories/records | head -n 10
 ```
 
 ## What this skill reads

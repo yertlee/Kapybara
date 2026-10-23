@@ -4,7 +4,7 @@
 
 Contacts split identity into two layers:
 
-- Platform contact id: `<platform>/<platform_id>` (for example, `telegram/567113516`)
+- Platform contact id: `<platform>/<platform_id>` (for example, `feishu/567113516`)
 - Internal unique contact id: short model-friendly id (`c[0-9a-z]+`, for example, `c1`, `c2`)
 
 The agent receives platform ids in events and stores unique ids in memory.
@@ -25,7 +25,7 @@ Example:
 
 ```json
 {
-  "c1": ["telegram/567113516"],
+  "c1": ["feishu/567113516"],
   "c2": ["discord/alice"]
 }
 ```

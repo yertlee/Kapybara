@@ -98,9 +98,9 @@ maintenance = PostgresMailboxMaintenance(storage)
 
 await writer.put(
     namespace="agent-main",
-    channel="telegram/chat/1",
+    channel="feishu/chat/1",
     payload={"text": "hello"},
-    producer="telegram",
+    producer="feishu",
 )
 
 messages = await inbox.get(MessageFilter(consumed=False), order="oldest_first")
@@ -137,9 +137,9 @@ writer/inbox/maintenance operations.
 ```python
 await writer.put(
     namespace="agent-a",
-    channel="telegram/chat/1",
+    channel="feishu/chat/1",
     payload={"text": "hello"},
-    producer="telegram",
+    producer="feishu",
 )
 ```
 
@@ -147,10 +147,10 @@ await writer.put(
 await writer.put_many(
     namespace="agent-b",
     items=[
-        MessageInput(channel="telegram/chat/1", payload={"text": "a"}),
-        MessageInput(channel="telegram/chat/2", payload={"text": "b"}),
+        MessageInput(channel="feishu/chat/1", payload={"text": "a"}),
+        MessageInput(channel="feishu/chat/2", payload={"text": "b"}),
     ],
-    producer="telegram",
+    producer="feishu",
 )
 ```
 
@@ -207,8 +207,8 @@ Mailbox channels reuse the existing slash-separated channel validation rules:
 
 Examples:
 
-- `telegram/chat/1`
-- `telegram/chat/1/thread/10`
+- `feishu/chat/1`
+- `feishu/chat/1/thread/10`
 
 `MessageFilter` supports:
 

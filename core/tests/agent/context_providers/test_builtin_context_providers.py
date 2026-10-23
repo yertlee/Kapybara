@@ -23,9 +23,9 @@ def test_memory_provider_builds_grounding_and_exposes_phase_tool_names(
     config_base = tmp_path / ".kapybara"
     provider = MemoryProvider.from_config(MemoryProviderConfig(config_base=config_base))
     ctx = TurnContext(
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
         out_channel=None,
-        contacts=("telegram/42",),
+        contacts=("feishu/42",),
         content="hello",
     )
 
@@ -38,7 +38,7 @@ def test_memory_provider_builds_grounding_and_exposes_phase_tool_names(
     assert provider.finalization_tool_names(ctx) == ["append_memory_record"]
 
     record = MemoryRecord(
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
         contacts=[],
         input="hello",
         output="world",
@@ -67,15 +67,15 @@ def test_preferences_provider_reuses_existing_prompt_loader(tmp_path: Path) -> N
     pref_root = config_base / "preferences"
     pref_root.mkdir(parents=True)
     (pref_root / "PREFERENCES.default.md").write_text("I like concise replies.\n")
-    (pref_root / "telegram.md").write_text("Use Telegram formatting.\n")
+    (pref_root / "feishu.md").write_text("Use Feishu formatting.\n")
 
     provider = PreferencesProvider.from_config(
         PreferencesProviderConfig(config_base=config_base)
     )
     ctx = TurnContext(
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
         out_channel=None,
-        contacts=("telegram/42",),
+        contacts=("feishu/42",),
         content="hello",
     )
 
@@ -94,12 +94,12 @@ def test_skills_provider_reuses_existing_skill_prompt_layout(tmp_path: Path) -> 
     skills_root = config_base / "skills"
     (skills_root / "core" / "demo" / "SKILLS.md").parent.mkdir(parents=True)
     (skills_root / "core" / "demo" / "SKILLS.md").write_text("# demo\n")
-    (skills_root / "messager" / "telegram" / "SKILLS.md").parent.mkdir(parents=True)
-    (skills_root / "messager" / "telegram" / "SKILLS.md").write_text("# telegram\n")
+    (skills_root / "messager" / "feishu" / "SKILLS.md").parent.mkdir(parents=True)
+    (skills_root / "messager" / "feishu" / "SKILLS.md").write_text("# feishu\n")
 
     provider = SkillsProvider.from_config(SkillsProviderConfig(config_base=config_base))
     ctx = TurnContext(
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
         out_channel=None,
         contacts=(),
         content="hello",
@@ -128,8 +128,8 @@ def test_skills_provider_reuses_existing_skill_prompt_layout(tmp_path: Path) -> 
         {"group": "messager"},
         ctx,
     ) == {
-        "uri": "skills:messager/telegram/SKILLS.md",
-        "content": "# telegram\n",
+        "uri": "skills:messager/feishu/SKILLS.md",
+        "content": "# feishu\n",
     }
 
 
@@ -153,7 +153,7 @@ def test_composite_provider_aggregates_grounding_and_namespaced_tools(
         ]
     )
     ctx = TurnContext(
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
         out_channel=None,
         contacts=(),
         content="hello",

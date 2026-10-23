@@ -346,7 +346,7 @@ def test_latest_memory_roots_by_in_channel_collects_channel_ids(
     ) -> list[str]:
         calls.append((in_channel, contact, num))
         result: list[str]
-        if in_channel == "telegram/chat/1":
+        if in_channel == "feishu/chat/1":
             result = ["m5", "m4", "m3", "m2", "m1", "m0"]
         elif contact == "c1":
             result = ["c3", "m5", "c2", "c1"]
@@ -360,11 +360,11 @@ def test_latest_memory_roots_by_in_channel_collects_channel_ids(
 
     channel_roots = latest_memory_roots_by_in_channel(
         store,
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
     )
 
     assert channel_roots == ["m5", "m4", "m3", "m2", "m1"]
-    assert calls == [("telegram/chat/1", None, 5)]
+    assert calls == [("feishu/chat/1", None, 5)]
 
 
 def test_latest_memory_roots_by_in_channel_matches_effective_out_channel(
@@ -373,14 +373,14 @@ def test_latest_memory_roots_by_in_channel_matches_effective_out_channel(
     store = FolderMemoryStore(tmp_path / "memories")
 
     direct = MemoryRecord(
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
         input="direct",
         output="",
         created_at=datetime(2026, 1, 1, 0, 0, 1),
     )
     routed = MemoryRecord(
         in_channel="worker/job/1",
-        out_channel="telegram/chat/1/thread/2",
+        out_channel="feishu/chat/1/thread/2",
         input="routed",
         output="",
         created_at=datetime(2026, 1, 1, 0, 0, 2),
@@ -397,7 +397,7 @@ def test_latest_memory_roots_by_in_channel_matches_effective_out_channel(
 
     channel_roots = latest_memory_roots_by_in_channel(
         store,
-        in_channel="telegram/chat/1",
+        in_channel="feishu/chat/1",
     )
 
     assert channel_roots == [routed.id_, direct.id_]
@@ -416,7 +416,7 @@ def test_latest_memory_roots_by_contact_dedupes_with_stable_order(
         num: int | None = None,
     ) -> list[str]:
         calls.append((in_channel, contact, num))
-        if in_channel == "telegram/chat/1":
+        if in_channel == "feishu/chat/1":
             return ["m3", "m2", "m3", "m1"]
         if contact == "c1":
             return ["m2", "c1"]

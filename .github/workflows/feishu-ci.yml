@@ -1,0 +1,37 @@
+name: Feishu runtime checks
+
+on:
+  push:
+    branches:
+      - refactor/feishu-only
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Install runtime and test dependencies
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}/core
+        run: |
+          python -m pip install uv
+          uv pip install --system -e ./shell-session-manager -e ./core -e ./collections pytest ruff
+      - name: Check Python sources
+        run: ruff check collections/src/kapy_collections/starters core/src/k/agent
+      - name: Run Feishu and core tests
+        run: python -m pytest collections/tests core/tests -q
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build runtime image
+        run: docker build -f docker/basic-os/Dockerfile .

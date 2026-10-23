@@ -75,7 +75,7 @@ def _extract_input_event_channel_root(instruct: Sequence[UserContent]) -> str | 
     """Best-effort extraction of an input channel root from Event JSON.
 
     `agent_run` typically receives a structured `Event` JSON as the first user
-    prompt item (e.g. from Telegram polling). When present, we use it to inject
+    prompt item (e.g. from a Feishu message). When present, we use it to inject
     channel-root specific skills in system prompts.
     """
 
