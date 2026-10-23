@@ -91,9 +91,9 @@ class _DemoProvider(ContextProvider[_DemoProviderConfig]):
 def test_structured_provider_exposes_local_tools_and_phase_names() -> None:
     provider = _DemoProvider.from_config(_DemoProviderConfig())
     ctx = TurnContext(
-        in_channel="feishu/chat/1",
+        in_channel="telegram/chat/1",
         out_channel=None,
-        contacts=("feishu/42",),
+        contacts=("telegram/42",),
         content="hello",
     )
 
@@ -125,7 +125,7 @@ def test_composite_provider_qualifies_and_dispatches_tool_names() -> None:
         ]
     )
     ctx = TurnContext(
-        in_channel="feishu/chat/1",
+        in_channel="telegram/chat/1",
         out_channel=None,
         contacts=(),
         content="hello",
@@ -146,7 +146,7 @@ def test_composite_provider_qualifies_and_dispatches_tool_names() -> None:
         ),
     ]
     assert composite.execute_tool("demo.lookup_demo", {"query": "q"}, ctx) == (
-        "feishu/chat/1:q"
+        "telegram/chat/1:q"
     )
     assert composite.execute_tool("demo.persist_demo", {"summary": "done"}, ctx) == {
         "ok": True
@@ -165,7 +165,7 @@ def test_composite_provider_rejects_undeclared_phase_tool_names() -> None:
         [_BadProvider.from_config(_DemoProviderConfig())]
     )
     ctx = TurnContext(
-        in_channel="feishu/chat/1",
+        in_channel="telegram/chat/1",
         out_channel=None,
         contacts=(),
         content="hello",

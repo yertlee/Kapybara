@@ -19,7 +19,7 @@ def _ctx_for_store(
 ) -> RunContext[Any]:
     contacts = resolved_contact_ids or []
     event = SimpleNamespace(
-        in_channel="feishu/chat/1",
+        in_channel="telegram/chat/1",
         out_channel=None,
     )
     working_memory_created_at = datetime.now()
@@ -40,7 +40,7 @@ def _ctx_for_store(
 
 def test_finish_action_accepts_existing_referenced_memory_ids(tmp_path) -> None:
     store = FolderMemoryStore(tmp_path / "memories")
-    parent = MemoryRecord(in_channel="feishu/chat/1", input="in", output="out")
+    parent = MemoryRecord(in_channel="telegram/chat/1", input="in", output="out")
     store.append(parent)
     ctx = _ctx_for_store(
         store,
@@ -90,7 +90,7 @@ def test_finish_action_retries_for_invalid_memory_id(tmp_path) -> None:
 def test_finish_action_ignores_missing_memory_id(tmp_path) -> None:
     store = FolderMemoryStore(tmp_path / "memories")
     missing_id = MemoryRecord(
-        in_channel="feishu/chat/1", input="in", output="out"
+        in_channel="telegram/chat/1", input="in", output="out"
     ).id_
 
     result = finish_action(

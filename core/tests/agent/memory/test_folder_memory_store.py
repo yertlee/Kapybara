@@ -613,7 +613,7 @@ def test_folder_store_get_latests_filters_by_in_channel_prefix(tmp_path) -> None
     store = FolderMemoryStore(root)
 
     room = MemoryRecord(
-        in_channel="feishu/chat/-1001",
+        in_channel="telegram/chat/-1001",
         contacts=["c1"],
         input="room",
         output="",
@@ -621,7 +621,7 @@ def test_folder_store_get_latests_filters_by_in_channel_prefix(tmp_path) -> None
         created_at=datetime(2026, 1, 1, 0, 0, 0),
     )
     thread = MemoryRecord(
-        in_channel="feishu/chat/-1001/thread/10",
+        in_channel="telegram/chat/-1001/thread/10",
         contacts=["c1", "c2"],
         input="thread",
         output="",
@@ -638,7 +638,7 @@ def test_folder_store_get_latests_filters_by_in_channel_prefix(tmp_path) -> None
     )
     routed = MemoryRecord(
         in_channel="worker/job/1",
-        out_channel="feishu/chat/-1001/thread/10",
+        out_channel="telegram/chat/-1001/thread/10",
         contacts=["c2"],
         input="routed",
         output="",
@@ -650,26 +650,26 @@ def test_folder_store_get_latests_filters_by_in_channel_prefix(tmp_path) -> None
     store.append(other)
     store.append(routed)
 
-    assert store.get_latests(in_channel="feishu/chat/-1001") == [
+    assert store.get_latests(in_channel="telegram/chat/-1001") == [
         routed.id_,
         thread.id_,
         room.id_,
     ]
-    assert store.get_latests(in_channel="feishu/chat/-1001/thread/10") == [
+    assert store.get_latests(in_channel="telegram/chat/-1001/thread/10") == [
         routed.id_,
         thread.id_,
     ]
-    assert store.get_latests(in_channel="feishu/chat/-1001/thread/11") == []
+    assert store.get_latests(in_channel="telegram/chat/-1001/thread/11") == []
     assert store.get_latests(contact="c1") == [thread.id_, room.id_]
     assert store.get_latests(contact="c2") == [routed.id_, other.id_, thread.id_]
-    assert store.get_latests(in_channel="feishu/chat/-1001", contact="c2") == [
+    assert store.get_latests(in_channel="telegram/chat/-1001", contact="c2") == [
         routed.id_,
         thread.id_,
     ]
-    assert store.get_latests(in_channel="feishu/chat/-1001", contact="c3") == []
-    assert store.get_latests(in_channel="feishu/chat/-1001", num=1) == [routed.id_]
+    assert store.get_latests(in_channel="telegram/chat/-1001", contact="c3") == []
+    assert store.get_latests(in_channel="telegram/chat/-1001", num=1) == [routed.id_]
     assert store.get_latests(contact="c2", num=1) == [routed.id_]
-    assert store.get_latests(in_channel="feishu/chat/-1001", contact="c2", num=1) == [
+    assert store.get_latests(in_channel="telegram/chat/-1001", contact="c2", num=1) == [
         routed.id_
     ]
     assert store.get_latests(num=0) == []
@@ -687,14 +687,14 @@ def test_folder_store_filter_by_in_channel(tmp_path) -> None:
     store = FolderMemoryStore(root)
 
     r1 = MemoryRecord(
-        in_channel="feishu/chat/-1001/thread/10",
+        in_channel="telegram/chat/-1001/thread/10",
         input="r1",
         output="",
         id_="--------",
         created_at=datetime(2026, 1, 1, 0, 0, 0),
     )
     r2 = MemoryRecord(
-        in_channel="feishu/chat/-1001/thread/11",
+        in_channel="telegram/chat/-1001/thread/11",
         input="r2",
         output="",
         id_="-------0",
@@ -709,7 +709,7 @@ def test_folder_store_filter_by_in_channel(tmp_path) -> None:
     )
     r4 = MemoryRecord(
         in_channel="worker/job/1",
-        out_channel="feishu/chat/-1001/thread/12",
+        out_channel="telegram/chat/-1001/thread/12",
         input="r4",
         output="",
         id_="-------2",
@@ -720,7 +720,7 @@ def test_folder_store_filter_by_in_channel(tmp_path) -> None:
     store.append(r3)
     store.append(r4)
 
-    files = store.filter_by_in_channel(in_channel_prefix="feishu/chat/-1001")
+    files = store.filter_by_in_channel(in_channel_prefix="telegram/chat/-1001")
     file_ids = [p.name.removesuffix(".detailed.jsonl") for p in files]
 
     assert file_ids == [r1.id_, r2.id_, r4.id_]
@@ -731,14 +731,14 @@ def test_folder_store_search_by_keywords(tmp_path) -> None:
     store = FolderMemoryStore(root)
 
     low = MemoryRecord(
-        in_channel="feishu/chat/-1001/thread/10",
+        in_channel="telegram/chat/-1001/thread/10",
         input="needle-low",
         output="",
         id_="--------",
         created_at=datetime(2026, 1, 1, 0, 0, 0),
     )
     high = MemoryRecord(
-        in_channel="feishu/chat/-1001/thread/10",
+        in_channel="telegram/chat/-1001/thread/10",
         input="x",
         output="needle-high",
         id_="zzzzzzzz",
@@ -748,7 +748,7 @@ def test_folder_store_search_by_keywords(tmp_path) -> None:
     store.append(high)
 
     files = store.filter_by_in_channel(
-        in_channel_prefix="feishu/chat/-1001/thread/10"
+        in_channel_prefix="telegram/chat/-1001/thread/10"
     )
     matches = store.search_by_keywords(
         files=files,

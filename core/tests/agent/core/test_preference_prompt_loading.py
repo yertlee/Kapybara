@@ -18,7 +18,7 @@ def test_channel_preference_candidates_use_root_when_present(tmp_path: Path) -> 
     preferred.write_text("preferred", encoding="utf-8")
 
     candidates = _channel_preference_candidates(
-        "feishu/chat/123",
+        "telegram/chat/123",
         pref_root=pref_root,
     )
 
@@ -32,7 +32,7 @@ def test_channel_preference_candidates_fall_back_to_default_when_root_missing(
     pref_root = tmp_path / ".kapybara" / "preferences"
 
     candidates = _channel_preference_candidates(
-        "feishu/chat/123",
+        "telegram/chat/123",
         pref_root=pref_root,
     )
 
@@ -46,16 +46,16 @@ def test_channel_preference_candidates_include_effective_out_channel(
 
     candidates = _channel_preference_candidates(
         "worker/job/123",
-        out_channel="feishu/chat/456/thread/7",
+        out_channel="telegram/chat/456/thread/7",
         pref_root=pref_root,
     )
 
     assert pref_root / "worker.md" in candidates
     assert pref_root / "worker/job/123.md" in candidates
-    assert pref_root / "feishu.md" in candidates
-    assert pref_root / "feishu/chat/456/thread/7.md" in candidates
+    assert pref_root / "telegram.md" in candidates
+    assert pref_root / "telegram/chat/456/thread/7.md" in candidates
     assert candidates.index(pref_root / "worker.md") < candidates.index(
-        pref_root / "feishu.md"
+        pref_root / "telegram.md"
     )
 
 
@@ -69,8 +69,8 @@ def test_load_preferences_prompt_accepts_root_preference_file(
     root_pref_path.write_text("root level preference", encoding="utf-8")
 
     prompt = load_preferences_prompt(
-        in_channel="feishu/chat/123",
-        contacts=["feishu/567113516"],
+        in_channel="telegram/chat/123",
+        contacts=["telegram/567113516"],
         pref_root=pref_root,
     )
 
@@ -90,8 +90,8 @@ def test_load_preferences_prompt_omits_default_when_root_exists(
     default.write_text("default root", encoding="utf-8")
 
     prompt = load_preferences_prompt(
-        in_channel="feishu/chat/123",
-        contacts=["feishu/567113516"],
+        in_channel="telegram/chat/123",
+        contacts=["telegram/567113516"],
         pref_root=pref_root,
     )
 
@@ -105,51 +105,51 @@ def test_load_preferences_prompt_includes_out_channel_preference(
     tmp_path: Path,
 ) -> None:
     pref_root = tmp_path / ".kapybara" / "preferences"
-    out_pref = pref_root / "feishu" / "chat" / "123" / "PREFERENCES.md"
+    out_pref = pref_root / "telegram" / "chat" / "123" / "PREFERENCES.md"
     out_pref.parent.mkdir(parents=True, exist_ok=True)
-    out_pref.write_text("reply via feishu", encoding="utf-8")
+    out_pref.write_text("reply via telegram", encoding="utf-8")
 
     prompt = load_preferences_prompt(
         in_channel="worker/job/1",
         contacts=[],
         pref_root=pref_root,
-        out_channel="feishu/chat/123",
+        out_channel="telegram/chat/123",
     )
 
     assert f"Path: {out_pref}" in prompt
-    assert "reply via feishu" in prompt
+    assert "reply via telegram" in prompt
 
 
 def test_load_preferences_prompt_dedupes_overlapping_in_and_out_channel_preferences(
     tmp_path: Path,
 ) -> None:
     pref_root = tmp_path / ".kapybara" / "preferences"
-    pref_path = pref_root / "feishu.md"
+    pref_path = pref_root / "telegram.md"
     pref_path.parent.mkdir(parents=True, exist_ok=True)
-    pref_path.write_text("feishu preference", encoding="utf-8")
+    pref_path.write_text("telegram preference", encoding="utf-8")
 
     prompt = load_preferences_prompt(
-        in_channel="feishu/chat/123",
+        in_channel="telegram/chat/123",
         contacts=[],
         pref_root=pref_root,
-        out_channel="feishu/chat/123/thread/5",
+        out_channel="telegram/chat/123/thread/5",
     )
 
     assert prompt.count(f"Path: {pref_path}") == 1
-    assert prompt.count("feishu preference") == 1
+    assert prompt.count("telegram preference") == 1
 
 
 def test_load_preferences_prompt_includes_contact_preference(
     tmp_path: Path,
 ) -> None:
     pref_root = tmp_path / ".kapybara" / "preferences"
-    contact_pref = pref_root / "contacts" / "feishu" / "567113516.md"
+    contact_pref = pref_root / "contacts" / "telegram" / "567113516.md"
     contact_pref.parent.mkdir(parents=True)
     contact_pref.write_text("contact preference", encoding="utf-8")
 
     prompt = load_preferences_prompt(
-        in_channel="feishu/chat/123",
-        contacts=["feishu/567113516"],
+        in_channel="telegram/chat/123",
+        contacts=["telegram/567113516"],
         pref_root=pref_root,
     )
 
@@ -161,12 +161,12 @@ def test_load_preferences_prompt_skips_contact_preference_when_contacts_missing(
     tmp_path: Path,
 ) -> None:
     pref_root = tmp_path / ".kapybara" / "preferences"
-    contact_pref = pref_root / "contacts" / "feishu" / "567113516.md"
+    contact_pref = pref_root / "contacts" / "telegram" / "567113516.md"
     contact_pref.parent.mkdir(parents=True)
     contact_pref.write_text("contact preference", encoding="utf-8")
 
     prompt = load_preferences_prompt(
-        in_channel="feishu/chat/123",
+        in_channel="telegram/chat/123",
         contacts=[],
         pref_root=pref_root,
     )
@@ -179,15 +179,15 @@ def test_load_preferences_prompt_includes_all_contact_preferences(
     tmp_path: Path,
 ) -> None:
     pref_root = tmp_path / ".kapybara" / "preferences"
-    first = pref_root / "contacts" / "feishu" / "100.md"
-    second = pref_root / "contacts" / "feishu" / "200.md"
+    first = pref_root / "contacts" / "telegram" / "100.md"
+    second = pref_root / "contacts" / "telegram" / "200.md"
     first.parent.mkdir(parents=True, exist_ok=True)
     first.write_text("first contact preference", encoding="utf-8")
     second.write_text("second contact preference", encoding="utf-8")
 
     prompt = load_preferences_prompt(
-        in_channel="feishu/chat/123",
-        contacts=["feishu/100", "feishu/200"],
+        in_channel="telegram/chat/123",
+        contacts=["telegram/100", "telegram/200"],
         pref_root=pref_root,
     )
 
@@ -205,14 +205,14 @@ def test_load_preferences_prompt_shows_resolved_symlink_target_for_contact(
     data_path.parent.mkdir(parents=True, exist_ok=True)
     data_path.write_text("contact preference from data", encoding="utf-8")
 
-    link_path = pref_root / "contacts" / "feishu" / "567113516.md"
+    link_path = pref_root / "contacts" / "telegram" / "567113516.md"
     link_path.parent.mkdir(parents=True, exist_ok=True)
     relative_target = Path(os.path.relpath(data_path, start=link_path.parent))
     link_path.symlink_to(relative_target)
 
     prompt = load_preferences_prompt(
-        in_channel="feishu/chat/123",
-        contacts=["feishu/567113516"],
+        in_channel="telegram/chat/123",
+        contacts=["telegram/567113516"],
         pref_root=pref_root,
     )
 

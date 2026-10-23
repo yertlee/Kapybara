@@ -17,11 +17,11 @@ def _write_skill(config_base: Path, *, group: str, name: str, content: str) -> N
 
 def test_extract_input_event_channel_root_from_event_json() -> None:
     event_json = Event(
-        in_channel="feishu/chat/1",
-        contacts=["feishu/1"],
+        in_channel="telegram/chat/1",
+        contacts=["telegram/1"],
         content="{}",
     ).model_dump_json()
-    assert _extract_input_event_channel_root([event_json]) == "feishu"
+    assert _extract_input_event_channel_root([event_json]) == "telegram"
 
 
 def test_extract_input_event_channel_root_ignores_non_event_strings() -> None:
@@ -39,15 +39,15 @@ def test_concat_skills_prompt_injects_messager_channel_root_skill(
     _write_skill(
         config_base,
         group="messager",
-        name="feishu",
-        content="messager feishu",
+        name="telegram",
+        content="messager telegram",
     )
 
     config = Config(config_base=config_base)
     event = Event(
-        in_channel="feishu/chat/1",
-        contacts=["feishu/1"],
-        out_channel="feishu/chat/1/thread/2",
+        in_channel="telegram/chat/1",
+        contacts=["telegram/1"],
+        out_channel="telegram/chat/1/thread/2",
         content="{}",
     )
     ctx = SimpleNamespace(
@@ -60,8 +60,8 @@ def test_concat_skills_prompt_injects_messager_channel_root_skill(
     prompt = concat_skills_prompt(ctx)  # type: ignore[arg-type]
     assert "<BasicSkills>" in prompt
     assert "<ChannelSkills>" in prompt
-    assert "# ===== skills:messager/feishu/SKILLS.md =====" in prompt
-    assert "messager feishu" in prompt
+    assert "# ===== skills:messager/telegram/SKILLS.md =====" in prompt
+    assert "messager telegram" in prompt
 
 
 def test_concat_skills_prompt_skips_channel_skills_when_unknown_roots(

@@ -517,9 +517,9 @@ async def test_sqlmodel_storage_append_messages_builds_sqlmodel_records() -> Non
         namespace="agent-a",
         items=[
             MessageInput(
-                channel="feishu/chat/1", payload={"index": 1}, producer="demo"
+                channel="telegram/chat/1", payload={"index": 1}, producer="demo"
             ),
-            MessageInput(channel="feishu/chat/2", payload={"index": 2}),
+            MessageInput(channel="telegram/chat/2", payload={"index": 2}),
         ],
         producer="fallback",
     )
@@ -543,8 +543,8 @@ async def test_sqlmodel_storage_append_messages_builds_sqlmodel_records() -> Non
         message.id for message in messages
     ]
     assert [record.channel for record in recording_session.added] == [
-        "feishu/chat/1",
-        "feishu/chat/2",
+        "telegram/chat/1",
+        "telegram/chat/2",
     ]
     assert [record.producer for record in recording_session.added] == [
         "demo",
@@ -579,23 +579,23 @@ async def test_sqlmodel_storage_scan_and_load_support_ordering_and_filters() -> 
     serializer = JSONMessageSerializer()
     first = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 1},
         created_at=clock.now(),
-        producer="feishu",
+        producer="telegram",
     )
     clock.advance(milliseconds=1)
     second = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 2},
         created_at=clock.now(),
-        producer="feishu",
+        producer="telegram",
     )
     clock.advance(milliseconds=1)
     third = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/2",
+        channel="telegram/chat/2",
         payload={"index": 3},
         created_at=clock.now(),
         producer="email",
@@ -648,7 +648,7 @@ async def test_sqlmodel_storage_scan_and_load_support_ordering_and_filters() -> 
     channel_ids = await storage.scan_message_ids(
         "agent-a",
         source="channel",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         after_id=None,
         cursor=None,
         order="oldest_first",
@@ -705,7 +705,7 @@ async def test_sqlmodel_storage_scan_and_load_support_ordering_and_filters() -> 
     assert first.id in session.statements[1].params.values()
 
     assert "mailbox_messages.channel" in session.statements[2].sql
-    assert "feishu/chat/1" in session.statements[2].params.values()
+    assert "telegram/chat/1" in session.statements[2].params.values()
 
     assert "raw_consumed_info IS NOT NULL" in session.statements[3].sql
     assert "raw_consumed_info IS NULL" in session.statements[4].sql
@@ -729,18 +729,18 @@ async def test_sqlmodel_storage_consume_messages_updates_state_and_classifies_id
     serializer = JSONMessageSerializer()
     first = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 1},
         created_at=clock.now(),
-        producer="feishu",
+        producer="telegram",
     )
     clock.advance(milliseconds=1)
     second = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 2},
         created_at=clock.now(),
-        producer="feishu",
+        producer="telegram",
     )
     previous_consumed_at = clock.now()
     first_row = _sqlmodel_message_record(
@@ -807,14 +807,14 @@ async def test_sqlmodel_storage_delete_messages_removes_rows_and_counts_consumed
     serializer = JSONMessageSerializer()
     first = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 1},
         created_at=clock.now(),
     )
     clock.advance(milliseconds=1)
     second = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/2",
+        channel="telegram/chat/2",
         payload={"index": 2},
         created_at=clock.now(),
     )
@@ -844,7 +844,7 @@ async def test_sqlmodel_storage_is_unconsumed_distinguishes_states_and_namespace
     clock = _ManualClock(datetime(2026, 5, 21, 12, 0, 0, tzinfo=UTC))
     second = Message(
         id=str(uuid6.uuid7()),
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 2},
         created_at=clock.now(),
     )
@@ -934,13 +934,13 @@ async def test_writer_put_requires_explicit_namespace_and_writes_there() -> None
 
     message = await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 1},
-        producer="feishu",
+        producer="telegram",
     )
 
     with pytest.raises(TypeError):
-        await writer.put(channel="feishu/chat/1", payload={"index": 2})  # type: ignore[call-arg]
+        await writer.put(channel="telegram/chat/1", payload={"index": 2})  # type: ignore[call-arg]
 
     assert (
         inspect.signature(PostgresMailboxWriter.put).parameters["namespace"].default
@@ -958,13 +958,13 @@ async def test_writer_can_route_to_multiple_namespaces() -> None:
 
     first = await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"namespace": "a"},
     )
     clock.advance(milliseconds=1)
     second = await writer.put(
         namespace="agent-b",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"namespace": "b"},
     )
 
@@ -981,22 +981,22 @@ async def test_writer_put_many_preserves_order_and_producer_fallback() -> None:
     messages = await writer.put_many(
         namespace="agent-a",
         items=[
-            MessageInput(channel="feishu/chat/1", payload={"index": 0}),
+            MessageInput(channel="telegram/chat/1", payload={"index": 0}),
             MessageInput(
-                channel="feishu/chat/1",
+                channel="telegram/chat/1",
                 payload={"index": 1},
                 producer="email",
             ),
-            MessageInput(channel="feishu/chat/2", payload={"index": 2}),
+            MessageInput(channel="telegram/chat/2", payload={"index": 2}),
         ],
-        producer="feishu",
+        producer="telegram",
     )
 
     assert [message.payload["index"] for message in messages] == [0, 1, 2]
     assert [message.producer for message in messages] == [
-        "feishu",
+        "telegram",
         "email",
-        "feishu",
+        "telegram",
     ]
     assert [message.id for message in await inbox.get(limit=None)] == [
         message.id for message in messages
@@ -1015,7 +1015,7 @@ async def test_writer_allow_list_allows_explicit_namespace() -> None:
 
     message = await writer.put(
         namespace="agent-b",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 1},
     )
 
@@ -1034,7 +1034,7 @@ async def test_writer_allow_list_rejects_disallowed_namespace_without_writing() 
     with pytest.raises(NamespaceNotAllowedError):
         await writer.put(
             namespace="agent-b",
-            channel="feishu/chat/1",
+            channel="telegram/chat/1",
             payload={"index": 1},
         )
 
@@ -1049,34 +1049,34 @@ async def test_inbox_get_supports_exact_channel_and_consumed_filters() -> None:
     inbox = PostgresMailboxInbox(storage, namespace="agent-a", clock=clock)
 
     root = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"kind": "root"}
+        namespace="agent-a", channel="telegram/chat/1", payload={"kind": "root"}
     )
     clock.advance(milliseconds=1)
     sibling = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"kind": "sibling"}
+        namespace="agent-a", channel="telegram/chat/1", payload={"kind": "sibling"}
     )
     clock.advance(milliseconds=1)
     child = await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1/thread/2",
+        channel="telegram/chat/1/thread/2",
         payload={"kind": "child"},
     )
     clock.advance(milliseconds=1)
     other = await writer.put(
-        namespace="agent-a", channel="feishu/chat/2", payload={"kind": "other"}
+        namespace="agent-a", channel="telegram/chat/2", payload={"kind": "other"}
     )
     _ = other
 
-    exact = await inbox.get(MessageFilter(channel="feishu/chat/1"))
+    exact = await inbox.get(MessageFilter(channel="telegram/chat/1"))
     await inbox.consume([sibling.id, child.id], consumer="agent")
     unconsumed = await inbox.get(MessageFilter(consumed=False), limit=None)
     consumed = await inbox.get(MessageFilter(consumed=True), limit=None)
     exact_unconsumed = await inbox.get(
-        MessageFilter(channel="feishu/chat/1", consumed=False),
+        MessageFilter(channel="telegram/chat/1", consumed=False),
         limit=None,
     )
     exact_consumed = await inbox.get(
-        MessageFilter(channel="feishu/chat/1", consumed=True),
+        MessageFilter(channel="telegram/chat/1", consumed=True),
         limit=None,
     )
 
@@ -1093,10 +1093,10 @@ async def test_consume_reports_consumed_already_consumed_and_not_found() -> None
     writer = PostgresMailboxWriter(storage, clock=clock)
     inbox = PostgresMailboxInbox(storage, namespace="agent-a", clock=clock)
     first = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     second = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 2}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 2}
     )
     missing_id = str(uuid6.uuid7())
 
@@ -1117,7 +1117,7 @@ async def test_consume_strict_raises_for_unknown_ids() -> None:
     writer = PostgresMailboxWriter(storage, clock=clock)
     inbox = PostgresMailboxInbox(storage, namespace="agent-a", clock=clock)
     message = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     missing_id = str(uuid6.uuid7())
 
@@ -1136,43 +1136,43 @@ async def test_message_filter_supports_producer_since_until_and_exact_channel() 
 
     await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 0},
-        producer="feishu",
+        producer="telegram",
     )
     clock.advance(seconds=1)
     kept = await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 1},
-        producer="feishu",
+        producer="telegram",
     )
     clock.advance(seconds=1)
     await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 2},
-        producer="feishu",
+        producer="telegram",
     )
     clock.advance(milliseconds=1)
     await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1/thread/2",
+        channel="telegram/chat/1/thread/2",
         payload={"index": 3},
-        producer="feishu",
+        producer="telegram",
     )
     clock.advance(milliseconds=1)
     await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 4},
         producer="email",
     )
 
     messages = await inbox.get(
         MessageFilter(
-            channel="feishu/chat/1",
-            producer="feishu",
+            channel="telegram/chat/1",
+            producer="telegram",
             since=kept.created_at,
             until=kept.created_at,
         ),
@@ -1190,7 +1190,7 @@ async def test_writer_rejects_non_json_payloads_by_default() -> None:
     with pytest.raises(PayloadSerializationError):
         await writer.put(
             namespace="agent-a",
-            channel="feishu/chat/1",
+            channel="telegram/chat/1",
             payload=object(),  # type: ignore[arg-type]
         )
 
@@ -1201,11 +1201,11 @@ async def test_get_after_missing_id_uses_pure_cursor_semantics() -> None:
     writer = PostgresMailboxWriter(storage, clock=clock)
     inbox = PostgresMailboxInbox(storage, namespace="agent-a", clock=clock)
     first = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     clock.advance(milliseconds=1)
     second = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 2}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 2}
     )
     missing_id = str(uuid6.UUID(int=uuid6.UUID(first.id).int + 1, version=7))
 
@@ -1229,15 +1229,15 @@ async def test_get_skips_missing_message_rows_but_keeps_cursor_semantics() -> No
     writer = PostgresMailboxWriter(storage, clock=clock)
     inbox = PostgresMailboxInbox(storage, namespace="agent-a", clock=clock)
     first = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     clock.advance(milliseconds=1)
     second = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 2}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 2}
     )
     clock.advance(milliseconds=1)
     third = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 3}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 3}
     )
 
     storage.delete_message_row_only("agent-a", first.id)
@@ -1255,7 +1255,7 @@ async def test_created_at_is_derived_from_generated_uuid_timestamp() -> None:
 
     message = await writer.put(
         namespace="agent-a",
-        channel="feishu/chat/1",
+        channel="telegram/chat/1",
         payload={"index": 1},
     )
 
@@ -1274,10 +1274,10 @@ async def test_manual_compact_only_affects_requested_namespace() -> None:
     inbox_b = PostgresMailboxInbox(storage, namespace="agent-b", clock=clock)
 
     first = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     await writer.put(
-        namespace="agent-b", channel="feishu/chat/1", payload={"index": 2}
+        namespace="agent-b", channel="telegram/chat/1", payload={"index": 2}
     )
     clock.advance(days=4)
 
@@ -1303,11 +1303,11 @@ async def test_compact_respects_keep_unconsumed_flag() -> None:
     maintenance = PostgresMailboxMaintenance(storage, clock=clock)
 
     old_unconsumed = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     clock.advance(days=1, milliseconds=1)
     old_consumed = await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 2}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 2}
     )
     await inbox.consume([old_consumed.id], consumer="agent")
     clock.advance(days=4)
@@ -1336,13 +1336,13 @@ async def test_auto_compacting_uses_explicit_namespaces_and_stops_on_exit(
     inbox_c = PostgresMailboxInbox(storage, namespace="agent-c", clock=clock)
 
     await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     await writer.put(
-        namespace="agent-b", channel="feishu/chat/1", payload={"index": 2}
+        namespace="agent-b", channel="telegram/chat/1", payload={"index": 2}
     )
     await writer.put(
-        namespace="agent-c", channel="feishu/chat/1", payload={"index": 3}
+        namespace="agent-c", channel="telegram/chat/1", payload={"index": 3}
     )
     clock.advance(days=4)
     caplog.set_level("WARNING")
@@ -1372,7 +1372,7 @@ async def test_auto_compacting_uses_explicit_namespaces_and_stops_on_exit(
     assert "Skipping mailbox compaction for namespace agent-b" in caplog.text
 
     await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 4}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 4}
     )
     clock.advance(days=4)
     await asyncio.sleep(0.05)
@@ -1390,10 +1390,10 @@ async def test_auto_compaction_lock_conflict_does_not_block_other_namespaces() -
     inbox_b = PostgresMailboxInbox(storage, namespace="agent-b", clock=clock)
 
     await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     await writer.put(
-        namespace="agent-b", channel="feishu/chat/1", payload={"index": 2}
+        namespace="agent-b", channel="telegram/chat/1", payload={"index": 2}
     )
     clock.advance(days=4)
     storage.lock_namespace("agent-a")
@@ -1421,7 +1421,7 @@ async def test_run_auto_compact_forever_blocks_current_task_until_cancelled() ->
     inbox = PostgresMailboxInbox(storage, namespace="agent-a", clock=clock)
 
     await writer.put(
-        namespace="agent-a", channel="feishu/chat/1", payload={"index": 1}
+        namespace="agent-a", channel="telegram/chat/1", payload={"index": 1}
     )
     clock.advance(days=4)
 
@@ -1532,13 +1532,13 @@ async def test_producer_supervisor_restarts_failed_producer_and_routes_multiple_
             raise RuntimeError("boom")
         await writer.put(
             namespace="agent-a",
-            channel="feishu/chat/1",
+            channel="telegram/chat/1",
             payload={"namespace": "a"},
             producer="demo",
         )
         await writer.put(
             namespace="agent-b",
-            channel="feishu/chat/1",
+            channel="telegram/chat/1",
             payload={"namespace": "b"},
             producer="demo",
         )
